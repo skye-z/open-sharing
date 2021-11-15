@@ -76,27 +76,44 @@ function outLog(msg) {
     console.log('[Backstage] ' + msg);
 }
 
-function returnJSON(data) {
-    if (data) return '{state:true,data:' + JSON.stringify(JSON.parse(data)) + '}';
-    return '{state:false}'
+function returnError(msg,res) {
+    res.setHeader("Content-Type", "application/json")
+    res.send({ state: false, message: msg })
+    return false
 }
 
-function downFolder(path) {
-    let state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
-    if (state === undefined) {
-        let output = fs.createWriteStream(path + '.zip');
-        let archive = archiver('zip', {
-            zlib: { level: 9 }
-        });
-        archive.pipe(output);
-        archive.directory(path, false);
-        archive.finalize();
-        archive.on("finish", function (res) {
-            state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
-            if (state === undefined) return '';
-            else return path + '.zip'
-        });
-    }else return path + '.zip'
+function downFile(type, path, res) {
+    let err = true
+    let state = fs.statSync(path, { throwIfNoEntry: false })
+    if (state === undefined) return err;
+    if (type === 'folder') {
+        let state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
+        if (state === undefined) {
+            outLog('Folder Compression...')
+            let output = fs.createWriteStream(path + '.zip');
+            let archive = archiver('zip', {
+                zlib: { level: 9 }
+            });
+            archive.pipe(output);
+            archive.directory(path, false);
+            archive.finalize();
+            archive.on("finish", function () {
+                state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
+                if (state === undefined) {
+                    res.setHeader("Content-Type", "application/json")
+                    res.send({ state: false, message: '文件夹打包出错' })
+                }
+                else res.download(path + '.zip')
+            });
+        } else res.download(path + '.zip')
+        outLog('Download Folder ' + path)
+        err = false
+    } else {
+        outLog('Download File ' + path)
+        res.download(path)
+        err = false
+    }
+    return err;
 }
 
 function initApp() {
@@ -116,58 +133,28 @@ function initApp() {
     app.get('/font/**', (req, res) => {
         res.sendFile(path.join(__dirname, '../public/font', req.path.replace("font/", "")))
     })
-    app.get('/down/*/*', (req, res) => {
+    app.post('/down/*/*', (req, res) => {
         let err = true
-        let path = req.path.substring(6)
-        let parameter = path.split('/')
+        let parameter = req.path.substring(6).split('/')
         if (parameter.length === 2) {
-            let auth = parameter[0]
             let index = parseInt(parameter[1])
-            if (auth === 'password' && !Boolean(req.query.pass)) {
-                res.setHeader("Content-Type", "application/json")
-                res.send({ state: false, message: '请提供访问密码' })
-                err = false
-            } else if (auth === 'all') {
-                let resList = config.getResList()
-                if (resList.length >= index + 1 && resList[index].auth === 'all') {
-                    let path = resList[index].path;
-                    let state = fs.statSync(path, { throwIfNoEntry: false })
-                    if (state !== undefined) {
-                        if (resList[index].type === 'folder') {
-                            let state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
-                            if (state === undefined) {
-                                outLog('Folder Compression...')
-                                let output = fs.createWriteStream(path + '.zip');
-                                let archive = archiver('zip', {
-                                    zlib: { level: 9 }
-                                });
-                                archive.pipe(output);
-                                archive.directory(path, false);
-                                archive.finalize();
-                                archive.on("finish", function (data) {
-                                    state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
-                                    if (state === undefined) {
-                                        res.setHeader("Content-Type", "application/json")
-                                        res.send({ state: false, message: '文件夹打包出错' })
-                                    }
-                                    else res.download(path + '.zip') 
-                                });
-                            }else res.download(path + '.zip') 
-                            outLog('Download Folder ' + path)
-                            err = false
-                        } else {
-                            outLog('Download File ' + path)
-                            res.download(path)
-                            err = false
-                        }
+            if (parameter[0] === 'password') {
+                if (!Boolean(req.query.pass)) err = returnError('请提供访问密码',res)
+                else {
+                    let resList = config.getResList()
+                    if (resList.length >= index + 1 && resList[index].auth === 'password') {
+                        console.log(resList[index].password)
+                        console.log(req.query.pass)
+                        if (resList[index].password+'' !== req.query.pass+'') err = returnError('访问密码错误',res)
+                        else err = downFile(resList[index].type, resList[index].path, res)
                     }
                 }
+            } else if (parameter[0] === 'all') {
+                let resList = config.getResList()
+                if (resList.length >= index + 1 && resList[index].auth === 'all') err = downFile(resList[index].type, resList[index].path, res)
             }
         }
-        if (err) {
-            res.setHeader("Content-Type", "application/json")
-            res.send({ state: false, message: '资源不存在' })
-        }
+        if (err) returnError('资源不存在',res)
     })
     app.get('/api/list', (req, res) => {
         let data = config.getResList()

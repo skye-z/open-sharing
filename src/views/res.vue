@@ -33,17 +33,30 @@
               <div class="type">{{ item.type }}</div>
             </td>
             <td>
-              <span class="color-gray" v-if="item.type==='folder'">无法统计</span>
+              <span class="color-gray" v-if="item.type === 'folder'"
+                >无法统计</span
+              >
               <span v-else-if="item.size">{{ item.size }}</span>
               <span v-else class="color-red">资源失效</span>
             </td>
             <td>
               <span v-if="item.auth === 'all'">公开</span>
               <span v-else-if="item.auth === 'password'">密码</span>
+              <div class="type">{{ item.password }}</div>
             </td>
             <td>
               <div>
-                <i class="el-icon-link" />
+                <i
+                  class="el-icon-copy-document"
+                  @click.stop="
+                    copy(
+                      index,
+                      Boolean(item.alias) ? item.alias : item.name,
+                      item.auth,
+                      item.password
+                    )
+                  "
+                />
                 <i
                   class="el-icon-delete"
                   @click.stop="delRes(item.path, item.name)"
@@ -59,6 +72,8 @@
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
+import { clipboard } from "electron";
 import Config from "../plugins/config";
 import Loading from "../components/loading";
 import resDrawer from "../components/res-drawer";
@@ -178,14 +193,40 @@ export default {
       this.addRes(e.dataTransfer.files);
       this.drop = false;
     },
+    copy(index, title, auth, pass) {
+      if (this.network.state && this.network.net.length < 1) {
+        this.$notify({
+          title: "网络无法连接",
+          type: "error",
+          showClose: false,
+          duration: 2000,
+        });
+        return false;
+      } else {
+        let downPath = `/down/${auth}/${index}`;
+        let txt = `我给你分享了《${title}》\n下载地址: http://${this.network.net[0]}:${this.network.port}${downPath}`;
+        if (pass) txt += `\n访问密码: ${pass}`;
+        clipboard.writeText(txt);
+        this.$notify({
+          title: "复制成功",
+          type: "success",
+          showClose: false,
+          duration: 2000,
+        });
+      }
+    },
   },
   mounted() {
+    ipcRenderer.once("ServiceGetInfoCallback", (event, data) => {
+      this.network = data;
+    });
     setTimeout(() => this.loadList(), 1000);
     let dropbox = document.getElementById("drop-mask");
     dropbox.addEventListener("dragleave", this.dragEnd);
     dropbox.addEventListener("drop", this.dropEnd, false);
     window.addEventListener("dragenter", this.dragStart);
     window.addEventListener("dragover", this.dragStart);
+    ipcRenderer.send("ServiceGetInfo");
   },
 };
 </script>

@@ -183,7 +183,7 @@ export default {
 }
 
 .ip-box{
-  justify-content: space-between;
+  justify-content: space-around;
   margin-top: 10px;
   display: flex;
 }

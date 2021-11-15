@@ -8,7 +8,7 @@ function getList(){
         if(res.state){
             for(let index in res.data){
                 let item = res.data[index]
-                $("#file-table tbody").append(`<tr onclick="downFile('${window.location}down/${item.auth}/${index}')"><td><div class="name line-1">${Boolean(item.alias) ? item.alias:item.name}</div><div class="path">${window.location}down/${item.auth}/${index}</div></td><td><div>${getType(item.type)}</div><div class="type">${item.type}</div></td><td>${item.type==='folder' ? '无法统计':item.size}</td><td>${item.auth==='all' ? '公开':'密码'}</td></tr>`)
+                $("#file-table tbody").append(`<tr onclick="${item.auth==='all' ? "postDownload('"+window.location+"down/"+item.auth+"/"+index+"')":"openPass('"+window.location+"down/"+item.auth+"/"+index+"')"}"><td><div class="name line-1">${Boolean(item.alias) ? item.alias:item.name}</div><div class="path">${window.location}down/${item.auth}/${index}</div></td><td><div>${getType(item.type)}</div><div class="type">${item.type}</div></td><td>${item.type==='folder' ? '无法统计':item.size}</td><td>${item.auth==='all' ? '公开':'密码'}</td></tr>`)
             }
         }
     },'json');
@@ -55,6 +55,15 @@ function getType(txt){
       else return "其他";
 }
 
-function downFile(path){
-  window.open(path)
+function openPass(path){
+  let pass = prompt("此资源受密码保护,请输入6位数字组成的访问密码.");
+  if(pass && pass.length === 6 && /[0-9]{6}/.test(pass)) postDownload(path,pass)
+  else alert("访问密码无效")
+}
+
+function postDownload(url, pass) {  
+  var form = $('<form></form>');  
+      form.attr('action', url + "?t=" + Math.random()+(Boolean(pass) ? "&pass="+pass:""));  
+      form.attr('method', 'post');  
+      form.appendTo('body').submit().remove();  
 }

@@ -1,5 +1,6 @@
-import fs from 'fs'
+import { clipboard } from 'electron';
 import { exec } from 'child_process';
+import fs from 'fs'
 
 const path = {
     res: 'config/resources.json',

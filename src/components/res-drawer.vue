@@ -16,7 +16,7 @@
     </div>
     <div class="item">
       <span class="mr-10">权限</span>
-      <el-radio-group size="mini" v-model="info.auth" fill="#13ce66">
+      <el-radio-group size="mini" v-model="info.auth" fill="#13ce66" @change="changeAuth">
         <el-radio-button label="all">公开访问</el-radio-button>
         <el-radio-button label="password">密码保护</el-radio-button>
       </el-radio-group>
@@ -28,7 +28,7 @@
         size="mini"
         style="width: 150px; margin-right: 10px"
       />
-      <div class="btn">生成</div>
+      <div class="btn" @click="buildPass">生成</div>
     </div>
     <template v-if="more.exist">
       <div class="item">
@@ -101,6 +101,9 @@ export default {
     openDir(path) {
       Config.open(path.substring(0, path.lastIndexOf("/")));
     },
+    changeAuth(auth){
+      if(auth==='password') this.buildPass();
+    },
     save() {
       if (this.remove) {
         Config.delRes(this.info.path);
@@ -116,6 +119,9 @@ export default {
         let state = Config.ediRes(this.index, this.info);
       }
     },
+    buildPass(){
+      this.info.password = Math.floor(Math.random()*(999999-100000+1)+100000);
+    }
   },
 };
 </script>
