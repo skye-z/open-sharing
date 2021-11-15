@@ -1,0 +1,13 @@
+{
+  "code": "123456",
+  "user": [
+    {
+      "name": "admin",
+      "password": "123456"
+    }
+  ],
+  "list": {
+    "black": [],
+    "white": []
+  }
+}
