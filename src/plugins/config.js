@@ -1,13 +1,12 @@
-import { clipboard } from 'electron';
 import { exec } from 'child_process';
 import logs from './logs'
 import fs from 'fs'
 
 const path = {
-    res: 'config/resources.json',
-    net: 'config/network.json',
-    sec: 'config/security.json',
-    other: 'config/other.json'
+    res: '/tmp/open-sharing/config/resources.json',
+    net: '/tmp/open-sharing/config/network.json',
+    sec: '/tmp/open-sharing/config/security.json',
+    other: '/tmp/open-sharing/config/other.json'
 }
 
 const config = {

@@ -5,6 +5,7 @@
   "repository": "https://github.com/skay-zhang/open-sharing",
   "author": "SkayZhang",
   "license": "MIT",
+  "main": "background.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

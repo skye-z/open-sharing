@@ -15,7 +15,7 @@ const service = {
     state: false,
     init: {
         server: (port) => {
-            logs.init()
+            // logs.init()
             if (port) service.port = port
             outLog('Service Init On Port ' + service.port)
             service.start()

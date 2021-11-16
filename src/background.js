@@ -6,6 +6,7 @@ import installExtension, {VUEJS3_DEVTOOLS} from 'electron-devtools-installer'
 import Service from "./plugins/service"
 import Config from "./plugins/config"
 import Logs from "./plugins/logs"
+import Init from './plugins/init'
 let tray;
 let win;
 
@@ -32,12 +33,14 @@ async function createWindow() {
         },
         icon: nativeImage.createFromPath('src/assets/logo.png')
     })
-
+    win.webContents.openDevTools()
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-        if (!process.env.IS_TEST) win.webContents.openDevTools()
+        Init.run()
+        // if (!process.env.IS_TEST) win.webContents.openDevTools()
     } else {
         createProtocol('app')
+        Init.run()
         win.loadURL('app://./index.html')
     }
 
@@ -82,11 +85,6 @@ async function createWindow() {
 
     Service.init.server()
 }
-
-// 关闭所有窗口后
-// app.on('window-all-closed', () => {
-//     app.quit()
-// })
 
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
@@ -144,29 +142,6 @@ function initMenu() {
                 ]
             },
             {
-                label: '管理',
-                submenu: [
-                    {
-                        label: '导入...',
-                        submenu: [
-                            {label: '导入文件'}, {label: '导入文件夹'}
-                        ]
-                    },
-                    {type: 'separator'},
-                    {label: '开启网络服务', type: 'checkbox'},
-                    {
-                        label: '安全防护',
-                        submenu: [
-                            {label: '开启白名单', type: 'checkbox'},
-                            {label: '开启黑名单', type: 'checkbox'},
-                            {type: 'separator'},
-                            {label: '开启密码验证', type: 'checkbox'},
-                            {label: '开启账户验证', type: 'checkbox'},
-                        ]
-                    },
-                ]
-            },
-            {
                 label: '帮助',
                 role: 'help',
                 submenu: [
@@ -186,7 +161,6 @@ function initMenu() {
             }
         },
         {type: 'separator'},
-        {label: '开启网络服务', type: 'checkbox'},
         {
             label: '访问地址',
             submenu: [
