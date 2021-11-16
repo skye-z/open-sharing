@@ -1,6 +1,7 @@
 import archiver from 'archiver'
 import express from 'express'
 import config from './config'
+import logs from './logs'
 import http from 'http'
 import path from 'path'
 import os from 'os'
@@ -14,6 +15,7 @@ const service = {
     state: false,
     init: {
         server: (port) => {
+            logs.init()
             if (port) service.port = port
             outLog('Service Init On Port ' + service.port)
             service.start()
@@ -55,8 +57,7 @@ const service = {
     getSocketList: () => {
         let list = []
         Sockets.forEach(function (socket) {
-            if (socket.remoteAddress === '::1') list.push("127.0.0.1")
-            else list.push(socket.remoteAddress.indexOf("::ffff:") === -1 ? socket.remoteAddress : socket.remoteAddress.replace("::ffff:", ""))
+            list.push(getIp(socket.remoteAddress))
         });
         return Array.from(new Set(list))
     },
@@ -74,6 +75,12 @@ const service = {
 
 function outLog(msg) {
     console.log('[Backstage] ' + msg);
+    logs.add(msg)
+}
+
+function getIp(txt){
+    if (txt === '::1') return "127.0.0.1"
+    else return txt.indexOf("::ffff:") === -1 ? txt : txt.replace("::ffff:", "")
 }
 
 function returnError(msg,res) {
@@ -89,7 +96,7 @@ function downFile(type, path, res) {
     if (type === 'folder') {
         let state = fs.statSync(path + '.zip', { throwIfNoEntry: false })
         if (state === undefined) {
-            outLog('Folder Compression...')
+            outLog(`Folder '${path}' Compression...`)
             let output = fs.createWriteStream(path + '.zip');
             let archive = archiver('zip', {
                 zlib: { level: 9 }
@@ -143,8 +150,6 @@ function initApp() {
                 else {
                     let resList = config.getResList()
                     if (resList.length >= index + 1 && resList[index].auth === 'password') {
-                        console.log(resList[index].password)
-                        console.log(req.query.pass)
                         if (resList[index].password+'' !== req.query.pass+'') err = returnError('访问密码错误',res)
                         else err = downFile(resList[index].type, resList[index].path, res)
                     }
@@ -170,6 +175,7 @@ function initApp() {
         }
         res.setHeader("Content-Type", "application/json")
         res.send({ state: true, data: retData })
+        logs.add('Client Query Resources List -> '+getIp(req.ip))
     })
     return app
 }

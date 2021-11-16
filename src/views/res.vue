@@ -95,6 +95,7 @@ export default {
   },
   methods: {
     loadList() {
+      ipcRenderer.send("ServiceGetInfo");
       this.list = Config.getResList();
       this.loading = false;
     },
@@ -198,7 +199,6 @@ export default {
         this.$notify({
           title: "网络无法连接",
           type: "error",
-          showClose: false,
           duration: 2000,
         });
         return false;
@@ -210,7 +210,6 @@ export default {
         this.$notify({
           title: "复制成功",
           type: "success",
-          showClose: false,
           duration: 2000,
         });
       }
@@ -226,7 +225,6 @@ export default {
     dropbox.addEventListener("drop", this.dropEnd, false);
     window.addEventListener("dragenter", this.dragStart);
     window.addEventListener("dragover", this.dragStart);
-    ipcRenderer.send("ServiceGetInfo");
   },
 };
 </script>

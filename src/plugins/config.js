@@ -1,5 +1,6 @@
 import { clipboard } from 'electron';
 import { exec } from 'child_process';
+import logs from './logs'
 import fs from 'fs'
 
 const path = {
@@ -27,6 +28,7 @@ const config = {
                 "alias": "",
                 "auth": "all"
             })
+            logs.add(`Add Resources '${file.name}' From ${file.path}`)
         }
         fs.writeFileSync(path.res, JSON.stringify(list))
     },
@@ -37,6 +39,7 @@ const config = {
         for (let i = 0; i < list.length; i++) {
             let res = list[i]
             if (res.path === resPath) {
+                logs.add(`Remove Resources '${res.name}' From ${res.path}`)
                 delIndex = i
                 break
             }

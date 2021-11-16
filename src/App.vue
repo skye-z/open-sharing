@@ -83,8 +83,16 @@ textarea,
   padding: 15px;
 }
 
+.mb-0{
+  margin-bottom: 0 !important;
+}
+
 .mb-10{
   margin-bottom: 10px;
+}
+
+.ml-10{
+  margin-left: 10px;
 }
 
 .mr-10{

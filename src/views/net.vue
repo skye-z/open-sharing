@@ -100,7 +100,6 @@ export default {
       this.$notify({
         title: '复制成功',
         type: 'success',
-        showClose: false,
         duration: 2000,
       })
     }

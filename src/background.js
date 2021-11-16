@@ -5,6 +5,7 @@ import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, {VUEJS3_DEVTOOLS} from 'electron-devtools-installer'
 import Service from "./plugins/service"
 import Config from "./plugins/config"
+import Logs from "./plugins/logs"
 let tray;
 let win;
 
@@ -73,6 +74,10 @@ async function createWindow() {
     // 获取资源列表
     ipcMain.on('ConfigResList', function (event) {
         event.sender.send("ConfigResListCallback",Config.getResList())
+    })
+    // 获取日志列表
+    ipcMain.on('LogList', function (event) {
+        event.sender.send("LogListCallback",Logs.get(100))
     })
 
     Service.init.server()
