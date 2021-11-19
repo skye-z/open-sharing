@@ -126,19 +126,19 @@ function downFile(type, path, res) {
 function initApp() {
     let app = express()
     app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/client', 'index.html'))
+        res.sendFile(path.join(__dirname, './client', 'index.html'))
     })
     app.get('/app.css', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/client', 'app.css'))
+        res.sendFile(path.join(__dirname, './client', 'app.css'))
     })
     app.get('/app.js', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/client', 'app.js'))
+        res.sendFile(path.join(__dirname, './client', 'app.js'))
     })
     app.get('/jquery.js', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/client', 'jquery.js'))
+        res.sendFile(path.join(__dirname, './client', 'jquery.js'))
     })
     app.get('/font/**', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/font', req.path.replace("font/", "")))
+        res.sendFile(path.join(__dirname, './fonts', req.path.replace("font/", "")))
     })
     app.post('/down/*/*', (req, res) => {
         let err = true

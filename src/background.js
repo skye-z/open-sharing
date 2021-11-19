@@ -33,11 +33,10 @@ async function createWindow() {
         },
         icon: nativeImage.createFromPath('src/assets/logo.png')
     })
-    win.webContents.openDevTools()
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
         Init.run()
-        // if (!process.env.IS_TEST) win.webContents.openDevTools()
+        if (!process.env.IS_TEST) win.webContents.openDevTools()
     } else {
         createProtocol('app')
         Init.run()
