@@ -4,7 +4,7 @@
       <el-col :md="16">
         <div class="card log">
           <div class="mb-10 ml-10 mr-10">
-            <div class="float-right" style="display: flex; align-items: center">
+            <div class="float-right lock">
               <el-switch
                 class="mr-10"
                 v-model="auto"
@@ -193,5 +193,11 @@ export default {
 
 .card.log .list > div:hover {
   background-color: rgb(46, 46, 46);
+}
+
+.card .lock {
+  align-items: center;
+  margin-top: -5px;
+  display: flex;
 }
 </style>

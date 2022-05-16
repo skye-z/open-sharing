@@ -16,7 +16,12 @@
     </div>
     <div class="item">
       <span class="mr-10">权限</span>
-      <el-radio-group size="mini" v-model="info.auth" fill="#13ce66" @change="changeAuth">
+      <el-radio-group
+        size="mini"
+        v-model="info.auth"
+        fill="#13ce66"
+        @change="changeAuth"
+      >
         <el-radio-button label="all">公开访问</el-radio-button>
         <el-radio-button label="password">密码保护</el-radio-button>
       </el-radio-group>
@@ -49,9 +54,9 @@
       <div class="item" style="margin-top: 0px">
         <span class="mr-10">查看</span>
         <div>
-          <el-button type="text" @click="openDir(info.path)"
-            ><i class="el-icon-folder-opened" />打开目录</el-button
-          >
+          <el-button type="text" @click="openDir(info.path)">
+            <el-icon><FolderOpened /></el-icon>打开目录
+          </el-button>
         </div>
       </div>
     </template>
@@ -81,9 +86,11 @@
 </template>
 
 <script>
+import { FolderOpened } from "@element-plus/icons-vue";
 import Config from "../plugins/config";
 export default {
   name: "resDrawer",
+  components: { FolderOpened },
   data() {
     return {
       remove: false,
@@ -104,8 +111,8 @@ export default {
     openDir(path) {
       Config.open(path.substring(0, path.lastIndexOf("/")));
     },
-    changeAuth(auth){
-      if(auth==='password') this.buildPass();
+    changeAuth(auth) {
+      if (auth === "password") this.buildPass();
     },
     save() {
       if (this.remove) {
@@ -122,9 +129,11 @@ export default {
         let state = Config.ediRes(this.index, this.info);
       }
     },
-    buildPass(){
-      this.info.password = Math.floor(Math.random()*(999999-100000+1)+100000);
-    }
+    buildPass() {
+      this.info.password = Math.floor(
+        Math.random() * (999999 - 100000 + 1) + 100000
+      );
+    },
   },
 };
 </script>
@@ -147,10 +156,10 @@ export default {
   color: #8b9ead;
 }
 
-.edit-custom input{
-    background-color: #082032;
-    border-color: #333333;
-    color: #f4f4f4;
+.edit-custom input {
+  background-color: #082032;
+  border-color: #333333;
+  color: #f4f4f4;
 }
 </style>
 

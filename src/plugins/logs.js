@@ -1,21 +1,11 @@
+import os from 'os'
 import fs from 'fs'
 
-const path = '/tmp/open-sharing/run.log'
+const path = os.homedir() + '/Library/Preferences/open-sharing/run.log'
 
 let num = 0
 
 const logs = {
-    init() {
-        let rootPath = '/tmp/open-sharing/config/'
-        if (!fs.existsSync(rootPath)) {
-            fs.mkdir(rootPath, { recursive: true }, (err) => {
-                if (err) throw err;
-                logs.add('Init Log Service')
-                logs.add('App Runing')
-                initConfig()
-            });
-        } else logs.add('App Runing')
-    },
     add(message) {
         num++
         fs.appendFile(path, '[' + new Date().toLocaleString() + '] ' + message + '\n', 'utf8', (err) => {
@@ -44,19 +34,6 @@ const logs = {
             }
         });
     }
-}
-
-function initConfig() {
-    let configPath = {
-        res: '/tmp/open-sharing/config/resources.json',
-        net: '/tmp/open-sharing/config/network.json',
-        sec: '/tmp/open-sharing/config/security.json',
-        other: '/tmp/open-sharing/config/other.json'
-    }
-    if (!fs.existsSync(configPath.res)) fs.writeFileSync(configPath.res, '[]', 'utf8')
-    if (!fs.existsSync(configPath.net)) fs.writeFileSync(configPath.net, '{}', 'utf8')
-    if (!fs.existsSync(configPath.sec)) fs.writeFileSync(configPath.sec, '{}', 'utf8')
-    if (!fs.existsSync(configPath.other)) fs.writeFileSync(configPath.other, '{}', 'utf8')
 }
 
 export default logs

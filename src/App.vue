@@ -62,7 +62,6 @@ textarea,
 #content {
   -webkit-app-region: no-drag;
 }
-
 .color-red{
   color: rgb(168, 24, 24);
 }
@@ -160,5 +159,17 @@ textarea,
 
 .el-message-box__btns .el-button--primary:hover{
   background-color: #4b6375;
+}
+
+input {
+  background-color: #082032;
+  border-color: #333333;
+  padding: 0 0 0 5px;
+  color: #f4f4f4;
+  font-size: 18px;
+}
+
+.el-input__wrapper {
+  background-color: #082032 !important;
 }
 </style>

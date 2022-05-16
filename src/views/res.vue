@@ -46,8 +46,7 @@
             </td>
             <td>
               <div>
-                <i
-                  class="el-icon-copy-document"
+                <el-icon
                   @click.stop="
                     copy(
                       index,
@@ -56,11 +55,11 @@
                       item.password
                     )
                   "
-                />
-                <i
-                  class="el-icon-delete"
-                  @click.stop="delRes(item.path, item.name)"
-                />
+                  ><CopyDocument
+                /></el-icon>
+                <el-icon @click.stop="delRes(item.path, item.name)"
+                  ><Delete
+                /></el-icon>
               </div>
             </td>
           </tr>
@@ -72,6 +71,7 @@
 </template>
 
 <script>
+import { CopyDocument, Delete } from "@element-plus/icons-vue";
 import { ipcRenderer } from "electron";
 import { clipboard } from "electron";
 import Config from "../plugins/config";
@@ -80,7 +80,7 @@ import resDrawer from "../components/res-drawer";
 
 export default {
   name: "resources",
-  components: { Loading, resDrawer },
+  components: { Loading, resDrawer, CopyDocument, Delete },
   data() {
     return {
       loading: true,

@@ -15,7 +15,6 @@ const service = {
     state: false,
     init: {
         server: (port) => {
-            // logs.init()
             if (port) service.port = port
             outLog('Service Init On Port ' + service.port)
             service.start()
@@ -78,12 +77,12 @@ function outLog(msg) {
     logs.add(msg)
 }
 
-function getIp(txt){
+function getIp(txt) {
     if (txt === '::1') return "127.0.0.1"
     else return txt.indexOf("::ffff:") === -1 ? txt : txt.replace("::ffff:", "")
 }
 
-function returnError(msg,res) {
+function returnError(msg, res) {
     res.setHeader("Content-Type", "application/json")
     res.send({ state: false, message: msg })
     return false
@@ -134,6 +133,9 @@ function initApp() {
     app.get('/app.js', (req, res) => {
         res.sendFile(path.join(__dirname, './client', 'app.js'))
     })
+    app.get('/favicon.png', (req, res) => {
+        res.sendFile(path.join(__dirname, './client', 'favicon.png'))
+    })
     app.get('/jquery.js', (req, res) => {
         res.sendFile(path.join(__dirname, './client', 'jquery.js'))
     })
@@ -146,11 +148,11 @@ function initApp() {
         if (parameter.length === 2) {
             let index = parseInt(parameter[1])
             if (parameter[0] === 'password') {
-                if (!Boolean(req.query.pass)) err = returnError('请提供访问密码',res)
+                if (!Boolean(req.query.pass)) err = returnError('请提供访问密码', res)
                 else {
                     let resList = config.getResList()
                     if (resList.length >= index + 1 && resList[index].auth === 'password') {
-                        if (resList[index].password+'' !== req.query.pass+'') err = returnError('访问密码错误',res)
+                        if (resList[index].password + '' !== req.query.pass + '') err = returnError('访问密码错误', res)
                         else err = downFile(resList[index].type, resList[index].path, res)
                     }
                 }
@@ -159,7 +161,7 @@ function initApp() {
                 if (resList.length >= index + 1 && resList[index].auth === 'all') err = downFile(resList[index].type, resList[index].path, res)
             }
         }
-        if (err) returnError('资源不存在',res)
+        if (err) returnError('资源不存在', res)
     })
     app.get('/api/list', (req, res) => {
         let data = config.getResList()
@@ -175,7 +177,7 @@ function initApp() {
         }
         res.setHeader("Content-Type", "application/json")
         res.send({ state: true, data: retData })
-        logs.add('Client Query Resources List -> '+getIp(req.ip))
+        logs.add('Client Query Resources List -> ' + getIp(req.ip))
     })
     return app
 }

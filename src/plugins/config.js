@@ -1,12 +1,15 @@
 import { exec } from 'child_process';
 import logs from './logs'
+import os from 'os'
 import fs from 'fs'
 
+const home = os.homedir() + '/Library/Preferences';
+
 const path = {
-    res: '/tmp/open-sharing/config/resources.json',
-    net: '/tmp/open-sharing/config/network.json',
-    sec: '/tmp/open-sharing/config/security.json',
-    other: '/tmp/open-sharing/config/other.json'
+    res: home + '/open-sharing/config/resources.json',
+    net: home + '/open-sharing/config/network.json',
+    sec: home + '/open-sharing/config/security.json',
+    other: home + '/open-sharing/config/other.json'
 }
 
 const config = {
@@ -48,12 +51,12 @@ const config = {
         fs.writeFileSync(path.res, JSON.stringify(list))
         return ""
     },
-    ediRes(index,info) {
+    ediRes(index, info) {
         let list = this.getResList();
-        if(list.length===0) return '资源不存在'
-        if(JSON.stringify(info)===JSON.stringify(list[index])) return '没有发现变动'
+        if (list.length === 0) return '资源不存在'
+        if (JSON.stringify(info) === JSON.stringify(list[index])) return '没有发现变动'
         list[index] = info;
-        fs.writeFileSync(path.res, JSON.stringify(list),'utf-8')
+        fs.writeFileSync(path.res, JSON.stringify(list), 'utf-8')
         return '更新成功'
     },
     getResInfo(path) {
@@ -73,23 +76,23 @@ const config = {
     getSecList() {
         let data = fs.readFileSync(path.sec, 'utf-8')
         if (data) return JSON.parse(data)
-        return {state:'off',black:[],white:[]}
+        return { state: 'off', black: [], white: [] }
     },
     switchState(state) {
         let list = config.getSecList()
         list.state = state
         fs.writeFileSync(path.sec, JSON.stringify(list))
     },
-    addList(ip,type){
+    addList(ip, type) {
         let list = config.getSecList()
-        if(!list.black) list.black = [];
-        if(!list.white) list.white = [];
-        if(!list.state) list.state = 'off';
-        if(list.black.indexOf(ip)===-1 && list.white.indexOf(ip)===-1){
-            if(type===1) list.black.push(ip);
+        if (!list.black) list.black = [];
+        if (!list.white) list.white = [];
+        if (!list.state) list.state = 'off';
+        if (list.black.indexOf(ip) === -1 && list.white.indexOf(ip) === -1) {
+            if (type === 1) list.black.push(ip);
             else list.white.push(ip);
-            logs.add(`Add '${ip}' To ${type===1 ? 'Black':'White'} List`)
-        }else return "此地址已存在";
+            logs.add(`Add '${ip}' To ${type === 1 ? 'Black' : 'White'} List`)
+        } else return "此地址已存在";
         fs.writeFileSync(path.sec, JSON.stringify(list))
     }
 }

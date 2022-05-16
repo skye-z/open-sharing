@@ -28,7 +28,7 @@
           @click="copy('http://' + item + ':' + info.port)"
         >
           <span>{{ index + 1 }}</span
-          >{{ item }}:{{ info.port }} <i class="el-icon-copy-document" />
+          >{{ item }}:{{ info.port }} <el-icon><CopyDocument /></el-icon>
         </div>
       </div>
     </div>
@@ -53,10 +53,9 @@
                 content="加入黑名单"
                 placement="top"
               >
-                <i
-                  class="button el-icon-remove color-red"
-                  @click="addList(item.ip, 1)"
-                />
+                <el-icon class="button color-red" @click="addList(item.ip, 1)">
+                  <Remove />
+                </el-icon>
               </el-tooltip>
               <el-tooltip
                 :offset="6"
@@ -64,10 +63,12 @@
                 content="加入白名单"
                 placement="top"
               >
-                <i
-                  class="button el-icon-circle-plus color-green"
+                <el-icon
+                  class="button color-green"
                   @click="addList(item.ip, 2)"
-                />
+                >
+                  <CirclePlus />
+                </el-icon>
               </el-tooltip>
             </template>
             <template v-else>
@@ -84,12 +85,14 @@
 </template>
 
 <script>
+import { CopyDocument } from "@element-plus/icons-vue";
 import { ipcRenderer } from "electron";
 import { clipboard } from "electron";
 import Config from "../plugins/config";
 
 export default {
   name: "network",
+  components: { CopyDocument },
   data() {
     return {
       loading: true,

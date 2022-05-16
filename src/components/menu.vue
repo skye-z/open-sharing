@@ -1,9 +1,11 @@
 <template>
   <div id="menu" class="noSelect">
     <div id="menu-tools">
-      <div id="menu-exit" @click="exit"><i class="el-icon-close" /></div>
+      <div id="menu-exit" @click="exit">
+        <el-icon><Close /></el-icon>
+      </div>
       <div id="menu-minimize" @click="minimize">
-        <i class="el-icon-minus" />
+        <el-icon><Minus /></el-icon>
       </div>
     </div>
     <div id="menu-logo">
@@ -16,7 +18,12 @@
       :class="{ action: action === index, bottom: item.bottom }"
       @click="switchMenu(index)"
     >
-      <i :class="item.icon" />
+      <el-icon>
+        <Box v-if="item.icon === 'box'" />
+        <Connection v-if="item.icon === 'connection'" />
+        <Umbrella v-if="item.icon === 'umbrella'" />
+        <Setting v-if="item.icon === 'setting'" />
+      </el-icon>
       <div>{{ item.name }}</div>
     </div>
   </div>
@@ -24,31 +31,33 @@
 
 <script>
 import { ipcRenderer } from "electron";
+import { Close,Minus,Box, Connection, Umbrella, Setting } from "@element-plus/icons-vue";
 
 export default {
   name: "appMenu",
+  components: { Close,Minus,Box, Connection, Umbrella, Setting },
   data() {
     return {
       action: 0,
       list: [
         {
           path: "/res",
-          icon: "el-icon-receiving",
+          icon: "box",
           name: "资源",
         },
         {
           path: "/net",
-          icon: "el-icon-connection",
+          icon: "connection",
           name: "网络",
         },
         {
           path: "/sec",
-          icon: "el-icon-umbrella",
+          icon: "umbrella",
           name: "安全",
         },
         {
           path: "/set",
-          icon: "el-icon-setting",
+          icon: "setting",
           name: "设置",
           bottom: true,
         },

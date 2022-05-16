@@ -1,8 +1,8 @@
 'use strict'
 
 import {ipcMain, app, protocol, BrowserWindow, Tray, Menu, nativeImage} from 'electron'
-import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, {VUEJS3_DEVTOOLS} from 'electron-devtools-installer'
+import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 import Service from "./plugins/service"
 import Config from "./plugins/config"
 import Logs from "./plugins/logs"

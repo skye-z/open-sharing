@@ -1,21 +1,26 @@
 <template>
   <div class="header">
     <div class="header-tools">
-      <div><i class="el-icon-arrow-left" /></div>
-      <div><i class="el-icon-arrow-right" /></div>
+      <el-icon><ArrowLeft /></el-icon>
+      <el-icon><ArrowRight /></el-icon>
     </div>
     <div class="header-address">
       <span class="address-item">/ 根目录</span>
       <span class="address-item">/ 二级文件夹</span>
       <span class="address-item">/ 三级文件夹</span>
     </div>
-    <div class="header-add"><i class="el-icon-upload"/> 导入</div>
+    <div class="header-add">
+      <el-icon><Upload /></el-icon> 导入
+    </div>
   </div>
 </template>
 
 <script>
+import { ArrowLeft, ArrowRight, Upload } from "@element-plus/icons-vue";
+
 export default {
   name: "appHeader",
+  components: { ArrowLeft, ArrowRight, Upload },
   data() {
     return {};
   },
@@ -69,7 +74,7 @@ export default {
   color: #8b9ead;
 }
 
-.header-add{
+.header-add {
   align-items: center;
   cursor: pointer;
   font-size: 14px;
@@ -77,12 +82,12 @@ export default {
   padding: 5px;
 }
 
-.header-add i{
+.header-add i {
   margin-right: 5px;
   font-size: 20px;
 }
 
-.header-add:hover{
+.header-add:hover {
   background-color: #081d2e;
 }
 </style>

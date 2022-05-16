@@ -21,14 +21,14 @@
       </div>
       <div class="config-item">
         <span class="mr-10">网络端口</span>
-        <el-input
+        <el-input-number
+          class="port"
+          controls-position="right"
           v-model="config.port"
-          type="number"
-          min="50000"
-          max="65535"
-          size="mini"
           placeholder="56565"
-          style="width: 100px"
+          :min="50000"
+          :max="65535"
+          size="mini"
         />
         <span class="tips" style="color: #f8b537"
           >*注意: 端口需在 50000 至 65535 之间</span
@@ -173,23 +173,12 @@ export default {
 </script>
 
 <style>
-.config-item input {
-  font-size: 18px;
-  padding: 0 0 0 5px;
-}
-
 .config-item .el-radio__label {
   color: #8b9ead;
 }
 
 .config-item .el-radio {
   margin-right: 10px;
-}
-
-.config-item input {
-  background-color: #082032;
-  border-color: #333333;
-  color: #f4f4f4;
 }
 </style>
 <style scoped>
