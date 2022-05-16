@@ -12,7 +12,7 @@
     <div class="path line-1">{{ info.path }}</div>
     <div class="item">
       <span class="mr-10">别名</span>
-      <el-input v-model="info.alias" size="mini" style="width: 210px" />
+      <el-input v-model="info.alias" size="mini" clearable style="width: 210px" />
     </div>
     <div class="item">
       <span class="mr-10">权限</span>
@@ -54,7 +54,7 @@
       <div class="item" style="margin-top: 0px">
         <span class="mr-10">查看</span>
         <div>
-          <el-button type="text" @click="openDir(info.path)">
+          <el-button text type="primary" @click="openDir(info.path)">
             <el-icon><FolderOpened /></el-icon>打开目录
           </el-button>
         </div>
@@ -148,18 +148,11 @@ export default {
 }
 
 .edit-custom input {
-  font-size: 18px;
-  padding: 0 0 0 5px;
+  color: #f4f4f4;
 }
 
 .edit-custom .el-radio__label {
   color: #8b9ead;
-}
-
-.edit-custom input {
-  background-color: #082032;
-  border-color: #333333;
-  color: #f4f4f4;
 }
 </style>
 

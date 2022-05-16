@@ -164,7 +164,6 @@ textarea,
 input {
   background-color: #082032;
   border-color: #333333;
-  padding: 0 0 0 5px;
   color: #f4f4f4;
   font-size: 18px;
 }
