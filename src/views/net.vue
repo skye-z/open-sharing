@@ -9,7 +9,7 @@
             </svg>
           </div>
         </div>
-        <div class="big-btn" :class="{'on':info.state}" @click="switchServer">
+        <div class="big-btn" :class="{ on: info.state }" @click="switchServer">
           <div>
             <div v-if="info.state">关闭服务</div>
             <div v-else>开启服务</div>
@@ -21,19 +21,62 @@
     <div class="card state">
       <div>访问地址</div>
       <div class="ip-box">
-        <div class="ip" v-for="(item,index) in info.net" :key="'net_'+index" @click="copy('http://'+item+':'+info.port)">
-          <span>{{index+1}}</span>{{ item }}:{{ info.port }} <i class="el-icon-copy-document" />
+        <div
+          class="ip"
+          v-for="(item, index) in info.net"
+          :key="'net_' + index"
+          @click="copy('http://' + item + ':' + info.port)"
+        >
+          <span>{{ index + 1 }}</span
+          >{{ item }}:{{ info.port }} <i class="el-icon-copy-document" />
         </div>
       </div>
     </div>
     <div class="card socket">
       <div class="mb-10">
         <span>在线设备 </span>
-        <span v-if="socket.length>0">({{socket.length}})</span>
+        <span v-if="socket.length > 0">({{ socket.length }})</span>
       </div>
       <el-scrollbar :height="175">
         <el-row>
-          <el-col :md="8" v-for="(item,index) in socket" :key="'socket_'+index">{{ item }} <i class="el-icon-delete"/> </el-col>
+          <el-col
+            :md="8"
+            v-for="(item, index) in socket"
+            :key="'socket_' + index"
+            class="socket-box"
+          >
+            <span class="mr-5">{{ item.ip }}</span>
+            <template v-if="item.list === ''">
+              <el-tooltip
+                :offset="6"
+                effect="dark"
+                content="加入黑名单"
+                placement="top"
+              >
+                <i
+                  class="button el-icon-remove color-red"
+                  @click="addList(item.ip, 1)"
+                />
+              </el-tooltip>
+              <el-tooltip
+                :offset="6"
+                effect="dark"
+                content="加入白名单"
+                placement="top"
+              >
+                <i
+                  class="button el-icon-circle-plus color-green"
+                  @click="addList(item.ip, 2)"
+                />
+              </el-tooltip>
+            </template>
+            <template v-else>
+              <span class="black-list" v-if="item.list === 'black'"
+                >黑名单</span
+              >
+              <span class="white-list" v-else>白名单</span>
+            </template>
+          </el-col>
         </el-row>
       </el-scrollbar>
     </div>
@@ -41,97 +84,153 @@
 </template>
 
 <script>
-import {ipcRenderer} from "electron";
+import { ipcRenderer } from "electron";
 import { clipboard } from "electron";
+import Config from "../plugins/config";
 
 export default {
-  name: 'network',
+  name: "network",
   data() {
     return {
       loading: true,
       info: {
         state: true,
         port: 56565,
-        net: []
+        net: [],
       },
       update: 0,
-      socket:[]
+      socket: [],
+      list: {
+        black: [],
+        white: [],
+      },
     };
   },
   methods: {
     switchServer() {
-      this.loading = true
+      this.loading = true;
       if (this.info.state) {
         ipcRenderer.send("ServiceStop");
         ipcRenderer.once("ServiceStopCallback", () => {
-          this.stopUpdate()
+          this.stopUpdate();
           setTimeout(() => {
-            this.info.state = false
+            this.info.state = false;
           }, 1000);
           setTimeout(() => {
-            this.loading = false
+            this.loading = false;
           }, 1500);
-        })
+        });
       } else {
         ipcRenderer.send("ServiceStart");
         ipcRenderer.once("ServiceStartCallback", (event, data) => {
-          this.info = data
-          this.startUpdate()
+          this.info = data;
+          this.startUpdate();
           setTimeout(() => {
-            this.info.state = true
+            this.info.state = true;
           }, 1000);
           setTimeout(() => {
-            this.loading = false
+            this.loading = false;
           }, 1500);
-        })
+        });
       }
     },
-    startUpdate(){
-      this.update = setInterval(()=>{
+    startUpdate() {
+      this.update = setInterval(() => {
+        this.getList();
         ipcRenderer.send("ServiceGetSocketList");
-      },1500)
+      }, 1500);
     },
-    stopUpdate(){
-      this.socket = []
-      clearInterval(this.update)
+    stopUpdate() {
+      this.socket = [];
+      clearInterval(this.update);
     },
-    copy(txt){
-      clipboard.writeText(txt)
+    copy(txt) {
+      clipboard.writeText(txt);
       this.$notify({
-        title: '复制成功',
-        type: 'success',
+        title: "复制成功",
+        type: "success",
         duration: 2000,
-      })
-    }
+      });
+    },
+    getList() {
+      this.list = Config.getSecList();
+      if (!this.list.black) this.list.black = [];
+      if (!this.list.white) this.list.white = [];
+    },
+    addList(ip, type) {
+      this.$confirm(
+        "确认要将 " + ip + " 加入" + (type === 1 ? "黑" : "白") + "名单吗?",
+        {
+          distinguishCancelAndClose: true,
+          confirmButtonText: "确认加入",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          let msg = Config.addList(ip, type);
+          if (!msg) {
+            this.getList();
+            ipcRenderer.send("ServiceGetSocketList");
+            this.$notify({
+              title: "加入成功",
+              type: "success",
+              duration: 2000,
+            });
+          } else {
+            this.$notify({
+              title: "加入失败",
+              message: msg,
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch((_) => {});
+    },
+    checkList(ip) {
+      if (this.list.black.indexOf(ip) !== -1) return "black";
+      if (this.list.white.indexOf(ip) !== -1) return "white";
+      return "";
+    },
   },
   mounted() {
+    this.getList();
     ipcRenderer.once("ServiceGetInfoCallback", (event, data) => {
-      this.loading = false
-      this.info = data
-    })
+      this.loading = false;
+      this.info = data;
+    });
     ipcRenderer.on("ServiceGetSocketListCallback", (event, data) => {
-      this.socket = data
-    })
+      let socketList = [];
+      for (let i in data) {
+        socketList.push({
+          ip: data[i],
+          list: this.checkList(data[i]),
+        });
+      }
+      this.socket = socketList;
+    });
     ipcRenderer.send("ServiceGetInfo");
-    this.startUpdate()
-  }
-}
+    this.startUpdate();
+  },
+};
 </script>
 
 <style scoped>
-.big-card{
+.big-card {
   justify-content: center;
   padding: 30px 0;
   display: flex;
 }
 
-.big-box{
+.big-box {
   background-color: #1a354b;
   border-radius: 200px;
   padding: 10px;
 }
 
-.loading, .big-btn {
+.loading,
+.big-btn {
   border-radius: 180px;
   height: 180px;
   width: 180px;
@@ -181,13 +280,13 @@ export default {
   font-size: 22px;
 }
 
-.ip-box{
+.ip-box {
   justify-content: space-around;
   margin-top: 10px;
   display: flex;
 }
 
-.ip{
+.ip {
   transition: all ease-out 0.3s;
   align-items: center;
   font-size: 20px;
@@ -195,7 +294,7 @@ export default {
   display: flex;
 }
 
-.ip span{
+.ip span {
   background-color: #082032;
   justify-content: center;
   align-items: center;
@@ -207,15 +306,39 @@ export default {
   width: 25px;
 }
 
-.ip i{
+.ip i {
   margin-left: 5px;
 }
 
-.ip:hover{
+.ip:hover {
   color: #97b0c4;
 }
 
-.card.socket{
+.card.socket {
   margin-bottom: 0;
+}
+
+.button {
+  cursor: pointer;
+}
+
+.socket-box {
+  align-items: center;
+  display: flex;
+}
+
+.black-list {
+  background-color: #000;
+  border-radius: 10px;
+  padding: 1px 3px;
+  font-size: 12px;
+}
+
+.white-list {
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  padding: 1px 3px;
+  font-size: 12px;
+  color: #333;
 }
 </style>

@@ -41,7 +41,10 @@
       </div>
       <div class="item">
         <span class="mr-10">大小</span>
-        <div>{{ more.size }}</div>
+        <div>
+          <span class="color-gray" v-if="info.type === 'folder'">无法统计</span>
+          <span v-else>{{ more.size }}</span>
+        </div>
       </div>
       <div class="item" style="margin-top: 0px">
         <span class="mr-10">查看</span>

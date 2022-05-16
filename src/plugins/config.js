@@ -69,6 +69,28 @@ const config = {
     open(path) {
         let data = exec('open ' + path)
         console.log(data)
+    },
+    getSecList() {
+        let data = fs.readFileSync(path.sec, 'utf-8')
+        if (data) return JSON.parse(data)
+        return {state:'off',black:[],white:[]}
+    },
+    switchState(state) {
+        let list = config.getSecList()
+        list.state = state
+        fs.writeFileSync(path.sec, JSON.stringify(list))
+    },
+    addList(ip,type){
+        let list = config.getSecList()
+        if(!list.black) list.black = [];
+        if(!list.white) list.white = [];
+        if(!list.state) list.state = 'off';
+        if(list.black.indexOf(ip)===-1 && list.white.indexOf(ip)===-1){
+            if(type===1) list.black.push(ip);
+            else list.white.push(ip);
+            logs.add(`Add '${ip}' To ${type===1 ? 'Black':'White'} List`)
+        }else return "此地址已存在";
+        fs.writeFileSync(path.sec, JSON.stringify(list))
     }
 }
 

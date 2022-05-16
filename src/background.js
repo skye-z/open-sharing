@@ -7,6 +7,7 @@ import Service from "./plugins/service"
 import Config from "./plugins/config"
 import Logs from "./plugins/logs"
 import Init from './plugins/init'
+import Path from 'path'
 let tray;
 let win;
 
@@ -30,8 +31,7 @@ async function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
-        },
-        icon: nativeImage.createFromPath('src/assets/logo.png')
+        }
     })
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -152,7 +152,7 @@ function initMenu() {
     }
 
     // 加载任务栏
-    tray = new Tray(nativeImage.createFromPath('src/assets/tray.png'))
+    tray = new Tray(nativeImage.createFromPath(Path.join(__dirname, "./img/tray.png")))
     tray.setContextMenu(Menu.buildFromTemplate([
         {
             label: '显示窗口', click: () => {

@@ -67,6 +67,10 @@ textarea,
   color: rgb(168, 24, 24);
 }
 
+.color-green{
+  color: rgb(55, 206, 18);
+}
+
 .color-gray{
   color: gray;
 }
@@ -93,6 +97,10 @@ textarea,
 
 .ml-10{
   margin-left: 10px;
+}
+
+.mr-5{
+  margin-right: 5px;
 }
 
 .mr-10{
